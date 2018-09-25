@@ -8,10 +8,11 @@ async function login(req, res) {
 
     Users.findOne({email : req.body.email}, (err, user) => {
         if (!user){
+            var hashedPassword = bcrypt.hashSync(req.body.password, 8);
             var userDefault = {
-                name: "account01",
+                name: req.body.name,
                 email: req.body.email,
-                password: "123",
+                password: hashedPassword,
                 role: "aluno"
             };
             Users.create(userDefault)

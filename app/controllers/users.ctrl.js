@@ -31,8 +31,19 @@ async function addUser(req, res) {
     });
 }
 
+async function deleteUser(req, res) {
+    Users.findByIdAndRemove(req.params.id, (err, result) => {
+        if (err) {
+            Rest.json(res, 500, {err: err});
+        } else {
+            Rest.json(res, 200, "Usuário removido.");
+        }
+    });
+}
+
 
 module.exports = {
     getUsers : getUsers,
     addUser : addUser,
+    deleteUser: deleteUser
 };
