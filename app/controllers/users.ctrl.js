@@ -1,6 +1,6 @@
 const Users = require('../db/models/users.mdl');
 const Rest = require('../util/services/rest');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 async function getUsers(req, res, next) {
     var users = [];
@@ -31,7 +31,8 @@ async function addUser(req, res) {
     });
 }
 
+
 module.exports = {
     getUsers : getUsers,
-    addUser : addUser
+    addUser : addUser,
 };
