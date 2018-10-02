@@ -15,4 +15,4 @@ const classSchema = Schema({
 
 }, {collection : 'classes'});
 
-module.exports = mongoose.model('Classes', userSchema);
+module.exports = mongoose.model('Classes', classSchema);

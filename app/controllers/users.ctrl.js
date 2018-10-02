@@ -1,6 +1,9 @@
 const Users = require('../db/models/users.mdl');
 const Rest = require('../util/services/rest');
+const Tokens = require('../db/models/tokens.mdl');
 const bcrypt = require('bcryptjs');
+const Time = require('../util/helpers/time');
+const TokenGenerator = require("../util/security/token-generator");
 
 async function getUsers(req, res, next) {
     var users = [];
@@ -41,9 +44,18 @@ async function deleteUser(req, res) {
     });
 }
 
+async function generateToken(req, res) {
+    TokenGenerator.generateToken(req, res);
+};
+
+async function joinAClass(req, res) {
+    Rest.json(res, 200, "CADASTRAR UMA TURMA DEVE PEGAR O TOKEN DE CADASTRO E A CLASSE\nDEVE VERIFICAR SE O TOKEN AINDA ESTA ATIVO E SE A TURMA ESTA CORRETA\nPEGA A TURMA O BANCO E ADICIONA O SER");
+}
 
 module.exports = {
     getUsers : getUsers,
     addUser : addUser,
-    deleteUser: deleteUser
+    deleteUser: deleteUser,
+    generateToken: generateToken,
+    joinAClass: joinAClass
 };
