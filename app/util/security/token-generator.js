@@ -19,48 +19,33 @@ async function generateToken(req, res) {
         Rest.json(res, 401, {err: 'This user is not authorized to create tokens'});
     }
 
-    var unique = false;
-    var token = createTokenString(5);
-
-
-    while (!unique) {
-        var existingToken = await Tokens.findOne({token: token});
-
-        if (existingToken) {
-            token = createTokenString(5);
+    Tokens.findOne(req.body.token, (err, token) => {
+        if (!err) {
+            Rest.json(res, 200, {token: token.token, message: 'Token already exists'});
         } else {
-            unique = true;
+            var newToken = createTokenString(5);
+            var newToken = {
+                token: newToken,
+                role: req.body.user.role,
+                class_id: req.body.class._id,
+                created_by: req.body.user._id
+            }
+            Tokens.create(newToken).then((respToken) => {
+                Rest.json(res, 200, {token: respToken.token, message: 'Token created successfully'});
+            }).catch((err) => {
+                Rest.json(res, 500, {err: err});
+            });
         }
-    }
-
-    var newToken = {
-        token: token,
-        role: req.body.user.role,
-        class_id: req.body.class._id,
-        created_by: req.body.user._id
-    }
-    
-    Tokens.create(newToken).then((respToken) => {
-        Rest.json(res, 200, {token: respToken.token, message: 'Token created successfully'});
-    }).catch((err) => {
-        Rest.json(res, 500, {err: err});
     });
+
 };
 
-function checkToken(req, res) {
-    var token = {
-        token: req.body.token,
-        created_by: req.body.created_by,
-        class_id : req.body.class_id,
-        expiration_date: req.body.expiration_date,
-        role: req.body.role
-    };
-
+function checkToken(token) {
     var date = new Date();
     if(date < token.expiration_date ){
-        return token.class_id;
+        return token;
     }else{
-        Rest.json(res, 500, "Date expired");
+       return -1;
     }
 };
 

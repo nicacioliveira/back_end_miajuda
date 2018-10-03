@@ -50,17 +50,29 @@ async function generateToken(req, res) {
 };
 
 async function joinAClass(req, res) {
+    var existingToken = await Tokens.findOne({token: req.body.token});
+    console.log(existingToken);
     Tokens.findOne(req.body.token, (err, token) => {
         if (err) {
             Rest.json(res, 500, "Token não existe");
         } else {
-            var class_id = TokenGenerator.checkToken(token, res);  //Check Token
-            var turma = Classes.findOne(class_id);                 //Find class
+            console.log(token);
+            var newTk = TokenGenerator.checkToken(token);
+            if(newTk != 1) {
+                console.log(newTk);
+                Classes.findOne({teacherId: newTk.created_by}, (err, classe) => {
+                    if (!err){
+                       // console.log(classe.students);
+                        Rest.json(res, 200, classe);
+                    } else {
+                        Rest.json(err, 500, "User not found");
+                    }
 
-            var user = Users.findOne(req.body.email);              //Find user
-            turma.addUser(user);                                   //Add User in Class
+                });            //Add User in Class
+            }else {
+                Rest.json(res, 500, "Date expired");
+            }
 
-            Rest.json(res,200,"Usuario adicionado na turma");
         }
     });
 }
