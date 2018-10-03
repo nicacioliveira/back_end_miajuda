@@ -1,4 +1,5 @@
 const Users = require('../db/models/users.mdl');
+const Classes = require('../db/models/classes.mdl');
 const Rest = require('../util/services/rest');
 const Tokens = require('../db/models/tokens.mdl');
 const bcrypt = require('bcryptjs');
@@ -49,7 +50,19 @@ async function generateToken(req, res) {
 };
 
 async function joinAClass(req, res) {
-    Rest.json(res, 200, "CADASTRAR UMA TURMA DEVE PEGAR O TOKEN DE CADASTRO E A CLASSE\nDEVE VERIFICAR SE O TOKEN AINDA ESTA ATIVO E SE A TURMA ESTA CORRETA\nPEGA A TURMA O BANCO E ADICIONA O SER");
+    Tokens.findOne(req.body.token, (err, token) => {
+        if (err) {
+            Rest.json(res, 500, "Token não existe");
+        } else {
+            var class_id = TokenGenerator.checkToken(token, res);  //Check Token
+            var turma = Classes.findOne(class_id);                 //Find class
+
+            var user = Users.findOne(req.body.email);              //Find user
+            turma.addUser(user);                                   //Add User in Class
+
+            Rest.json(res,200,"Usuario adicionado na turma");
+        }
+    });
 }
 
 module.exports = {
