@@ -47,8 +47,21 @@ async function generateToken(req, res) {
     });
 };
 
-function checkToken() {
-    
+function checkToken(req, res) {
+    var token = {
+        token: req.body.token,
+        created_by: req.body.created_by,
+        class_id : req.body.class_id,
+        expiration_date: req.body.expiration_date,
+        role: req.body.role
+    };
+
+    var date = new Date();
+    if(date < token.expiration_date ){
+        return token.class_id;
+    }else{
+        Rest.json(res, 500, "Date expired");
+    }
 };
 
 module.exports = {
