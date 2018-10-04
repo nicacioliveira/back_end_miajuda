@@ -42,11 +42,14 @@ async function generateToken(req, res) {
 
 function checkToken(token) {
     var date = new Date();
-    if(date < token.expiration_date ){
-        return token;
-    }else{
-       return -1;
-    }
+    if(date > token.expiration_date)
+        return {err: true, code: 500, msg: "Token expirado"};
+        
+    
+    if (token.token.length !== DEFAULT_TOKEN_LENGHT)
+        return {err: true, code: 500, msg: "Token inválido"};
+
+    return {err: false}
 };
 
 module.exports = {

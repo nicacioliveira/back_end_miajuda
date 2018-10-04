@@ -50,31 +50,57 @@ async function generateToken(req, res) {
 };
 
 async function joinAClass(req, res) {
-    var existingToken = await Tokens.findOne({token: req.body.token});
-    console.log(existingToken);
-    Tokens.findOne(req.body.token, (err, token) => {
-        if (err) {
-            Rest.json(res, 500, "Token não existe");
-        } else {
-            console.log(token);
-            var newTk = TokenGenerator.checkToken(token);
-            if(newTk != 1) {
-                console.log(newTk);
-                Classes.findOne({teacherId: newTk.created_by}, (err, classe) => {
-                    if (!err){
-                       // console.log(classe.students);
-                        Rest.json(res, 200, classe);
-                    } else {
-                        Rest.json(err, 500, "User not found");
-                    }
 
-                });            //Add User in Class
-            }else {
-                Rest.json(res, 500, "Date expired");
+    await Tokens.findOne({token: req.body.token})
+    .then((tokenObj) => {
+        //verify token
+        var checkToken = TokenGenerator.checkToken(tokenObj);
+        if (checkToken.err) 
+            Rest.json(res, 500, checkToken.err);
+     
+        //verify user id
+        Users.findOne({_id: req.body.user_id}).then((user) => {
+            if (!user) {
+                Rest.json(res, 500, "Usuário não existe");
+            } else {
+                //update class
+                Classes.findOneAndUpdate(
+                    {_id:   tokenObj.class_id}, 
+                    {$push: {students: user.email}}, 
+                    {new:   true},
+                    (err, Class) => {
+                        if (err)
+                            Rest.json(res, 500, "Algo deu errado");
+                        else
+                            Rest.json(res, 200, Class);
+                    });
             }
-
-        }
+        }).catch();
+    })
+    .catch((err) => {
+        Rest.json(res, 500, "Token não existe");
     });
+
+}
+
+async function getMyClasses(req, res) {
+    Users.findOne({_id: req.params.id})
+    .then((user) => {
+        var resp = [];
+        Classes.find({}, (err, cls) => {
+            if (err) 
+                Rest.json(res, 500, "Algo deu errado");
+            else {
+                cls.map(c => {
+                    if (c.students.indexOf(user.email) !== -1) resp.push(c);
+                });
+                Rest.json(res, 200, resp);
+            }
+        });
+    })
+    .catch((err) => {
+        Rest.json(res, 500, "Usuário não existe");
+    })
 }
 
 module.exports = {
@@ -82,5 +108,6 @@ module.exports = {
     addUser : addUser,
     deleteUser: deleteUser,
     generateToken: generateToken,
-    joinAClass: joinAClass
+    joinAClass: joinAClass,
+    getMyClasses: getMyClasses
 };
