@@ -19,25 +19,32 @@ async function generateToken(req, res) {
         Rest.json(res, 401, {err: 'This user is not authorized to create tokens'});
     }
 
-    Tokens.findOne(req.body.token, (err, token) => {
-        if (!err) {
-            Rest.json(res, 200, {token: token.token, message: 'Token already exists'});
-        } else {
-            var newToken = createTokenString(5);
-            var newToken = {
-                token: newToken,
-                role: req.body.user.role,
-                class_id: req.body.class._id,
-                created_by: req.body.user._id
-            }
-            Tokens.create(newToken).then((respToken) => {
-                Rest.json(res, 200, {token: respToken.token, message: 'Token created successfully'});
-            }).catch((err) => {
-                Rest.json(res, 500, {err: err});
-            });
-        }
-    });
+    var unique = false;
+    var token = createTokenString(5);
 
+
+    while (!unique) {
+        var existingToken = await Tokens.findOne({token: token});
+
+        if (existingToken) {
+            token = createTokenString(5);
+        } else {
+            unique = true;
+        }
+    }
+
+    var newToken = {
+        token: token,
+        role: req.body.user.role,
+        class_id: req.body.class._id,
+        created_by: req.body.user._id
+    }
+    
+    Tokens.create(newToken).then((respToken) => {
+        Rest.json(res, 200, {token: respToken.token, message: 'Token created successfully'});
+    }).catch((err) => {
+        Rest.json(res, 500, {err: err});
+    });
 };
 
 function checkToken(token) {
