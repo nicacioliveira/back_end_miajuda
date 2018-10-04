@@ -7,5 +7,8 @@ var usersCtrl = require('../../controllers/users.ctrl');
 usersRoute.get('/', usersCtrl.getUsers);
 usersRoute.post('/', usersCtrl.addUser);
 usersRoute.delete('/:id', usersCtrl.deleteUser);
+usersRoute.post('/generateToken', usersCtrl.generateToken);
+usersRoute.post('/joinAClass', usersCtrl.joinAClass);
+usersRoute.get('/:id/getMyClasses', usersCtrl.getMyClasses);
 
 module.exports = usersRoute;

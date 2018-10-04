@@ -5,9 +5,9 @@ const DB_PROPS = {
 };
 
 function getDatabase() {
-    // LOCAL HOST
+    return 'mongodb://localhost:27017/miajuda';
     // return `mongodb://${DB_PROPS.credentials? DB_PROPS.credentials + "@" : ""}${DB_PROPS.dbAddress}/${DB_PROPS.dbName}`;
-    return `mongodb://admin:admin123@ds255282.mlab.com:55282/monitoriasufcg`
+    //return `mongodb://admin:admin123@ds255282.mlab.com:55282/monitoriasufcg`
 }
 
 module.exports = {
