@@ -84,7 +84,7 @@ async function joinAClass(req, res) {
 }
 
 async function getMyClasses(req, res) {
-    Users.findOne({_id: req.params.id})
+    Users.findOne({email: req.body.email})
     .then((user) => {
         var resp = [];
         Classes.find({}, (err, cls) => {
