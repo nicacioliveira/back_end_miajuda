@@ -4,7 +4,11 @@ const Rest = require('../util/services/rest');
 
 async function getClasses(req, res, next) {
     var classes = [];
-    var dbClasses = await Class.find();
+    var dbClasses = await Class.find().populate({
+        path: 'teacherId',
+        select:
+            'name'
+    });
     for (var c of dbClasses) {
         classes.push(c);
     }
@@ -28,7 +32,7 @@ async function addClass(req, res, next) {
 }
 
 async function deleteClass(req, res) {
-    Users.findByIdAndRemove(req.params.id, (err, result) => {
+    Class.findByIdAndRemove(req.params.id, (err, result) => {
         if (err) {
             Rest.json(res, 500, {err: err});
         } else {

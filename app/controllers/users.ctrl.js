@@ -59,7 +59,7 @@ async function joinAClass(req, res) {
             Rest.json(res, 500, checkToken.err);
      
         //verify user id
-        Users.findOne({_id: req.body.user_id}).then((user) => {
+        Users.findOne({_id: req.body.email}).then((user) => {
             if (!user) {
                 Rest.json(res, 500, "Usuário não existe");
             } else {
@@ -84,19 +84,23 @@ async function joinAClass(req, res) {
 }
 
 async function getMyClasses(req, res) {
-    Users.findOne({email: req.body.email}).then((user) => {
+    Users.findOne({email: req.query.email}).then((user) => {
         
         if (!user) {
             Rest.json(res, 500, "Usuário não existe");
         } else {
 
         var resp = [];
-        Classes.find({}, (err, cls) => {
+        Classes.find({}).populate({
+            path: 'teacherId',
+            select:
+                'name'
+        }).exec((err, cls) => {
             if (err) 
                 Rest.json(res, 500, "Algo deu errado");
             else {
                 cls.map(c => {
-                    if (c.students.indexOf(req.body.email) !== -1) resp.push(c);
+                    if (c.students.indexOf(req.query.email) !== -1) resp.push(c);
                 });
                 Rest.json(res, 200, resp);
             }
