@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const classSchema = Schema({
     name: {
+        unique: true,
         required : true,
         type: String
     },

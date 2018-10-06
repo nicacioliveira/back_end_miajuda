@@ -5,7 +5,7 @@ var Authenticator = require('../util/security/authenticator');
 var Rest = require('../util/services/rest');
 
 async function login(req, res) {
-
+    try {
     Users.findOne({email : req.body.email}, (err, user) => {
         if (!user){
             var hashedPassword = bcrypt.hashSync(req.body.password, 8);
@@ -21,13 +21,16 @@ async function login(req, res) {
                             })
 
         }else if (!bcrypt.compareSync(req.body.password, user.password)) {
-            return Rest.json(res, 401, {err: 'Wrong password'});
+            return Rest.json(res, 401, {err: 'Senha incorreta!'});
 
         }else {
             var token = Authenticator.generateJWT(user);
             return Rest.json(res, 200, {user: {name: user.name, email: user.email, role: user.role}, jwt: token});
         }
     })
+    } catch (err) {
+        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
+    }
 }
 
 
