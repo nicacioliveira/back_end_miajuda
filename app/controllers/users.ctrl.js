@@ -101,7 +101,7 @@ async function joinAClass(req, res) {
 
 async function getMyClasses(req, res) {
     try {
-        Users.findOne({ email: req.body.email }).then((user) => {
+        Users.findOne({ email: req.query.email }).then((user) => {
 
             if (!user) {
                 Rest.json(res, 500, "Usuário não existe");
