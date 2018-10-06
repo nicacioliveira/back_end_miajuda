@@ -16,18 +16,18 @@ function createTokenString(length) {
 async function generateToken(req, res) {
 
     if (credentialedUsersToGenerateToken.indexOf(req.body.user.role) === -1) {
-        Rest.json(res, 401, {err: 'This user is not authorized to create tokens'});
+        Rest.json(res, 401, {err: 'Você não tem tem altorização para criar tokens.'});
     }
 
     var unique = false;
-    var token = createTokenString(5);
+    var token = createTokenString(DEFAULT_TOKEN_LENGHT);
 
 
     while (!unique) {
         var existingToken = await Tokens.findOne({token: token});
 
         if (existingToken) {
-            token = createTokenString(5);
+            token = createTokenString(DEFAULT_TOKEN_LENGHT);
         } else {
             unique = true;
         }
@@ -41,9 +41,9 @@ async function generateToken(req, res) {
     }
     
     Tokens.create(newToken).then((respToken) => {
-        Rest.json(res, 200, {token: respToken.token, message: 'Token created successfully'});
+        Rest.json(res, 200, {token: respToken.token, message: 'Token criado com sucesso!'});
     }).catch((err) => {
-        Rest.json(res, 500, {err: err});
+        Rest.json(res, 500, {log: err, msg: "Não foi possível criar o token."});
     });
 };
 
