@@ -91,7 +91,11 @@ async function getMyClasses(req, res) {
         } else {
 
         var resp = [];
-        Classes.find({}, (err, cls) => {
+        Classes.find({}).populate({
+            path: 'teacherId',
+            select:
+                'name'
+        }).exec((err, cls) => {
             if (err) 
                 Rest.json(res, 500, "Algo deu errado");
             else {
