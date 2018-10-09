@@ -16,6 +16,7 @@
     "jest": "^22.0.4",
     "jest-cli": "^22.4.2",
     "jsonwebtoken": "^8.3.0",
+    "jwt-decode": "^2.2.0",
     "mongoose": "^5.2.17",
     "require.js": "^1.0.0",
     "supertest": "3.0.0"
