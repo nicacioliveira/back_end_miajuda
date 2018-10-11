@@ -79,7 +79,7 @@ async function deleteClass(req, res) {
             }).catch((err) => {
                 Rest.notAuthorized(res, err);
             });
-
+            
         }
     } catch (err) {
         Rest.somethingWentWrong(res, err);
