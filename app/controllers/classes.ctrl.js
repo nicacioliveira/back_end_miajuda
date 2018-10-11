@@ -1,4 +1,4 @@
-const Class = require('../db/models/classes.mdl');
+const Classes = require('../db/models/classes.mdl');
 const Rest = require('../util/services/rest');
 const classcodeGenerator = require('../util/security/classCodeGenerator');
 const Users = require('../db/models/users.mdl');
@@ -8,7 +8,7 @@ const {isEmpty} = require('../util/helpers/stringCheckers');
 async function getClasses(req, res, next) {
     try {
         var classes = [];
-        var dbClasses = await Class.find()
+        var dbClasses = await Classes.find()
         .populate({
             path: 'teacherId',
             select:'name'
@@ -46,7 +46,7 @@ async function addClass(req, res, next) {
                 monitors: req.body.monitors
             }
 
-            await Class.create(newClass).then((classresp) => {
+            await Classes.create(newClass).then((classresp) => {
                 Rest.json(res, 200, { class: newClass });
             }).catch((err) => {
                 if (err.code === 11000) {
@@ -61,15 +61,28 @@ async function addClass(req, res, next) {
     }
 }
 
+
+
 async function deleteClass(req, res) {
     try {
-        Class.findByIdAndRemove(req.params.id, (err, result) => {
-            if (err) {
-                Rest.somethingWentWrong(res, err);
-            } else {
-                Rest.ok(res);
-            }
-        });
+        var user = await Handles.getUserOfHeaderAuthJWT(req, res);
+
+        if (user.role !== "professor")
+            Rest.notAuthorized(res, true);
+        else if (isEmpty(req.query.id))
+            Rest.idIsRequired(res, true);
+        else {
+
+            Classes.findOneAndDelete({_id: req.query.id, teacherId: user._id}).then((resp) => {
+                if (!resp)
+                    Rest.classNotFound(res, true);
+                else
+                    Rest.ok(res, true);
+            }).catch((err) => {
+                Rest.notAuthorized(res, err);
+            });
+            
+        }
     } catch (err) {
         Rest.somethingWentWrong(res, err);
     }

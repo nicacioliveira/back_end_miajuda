@@ -33,6 +33,11 @@ function nameIsRequired(res, err) {
     res.json({err: err, log: 'Nome não pode ser vazio!'});
 }
 
+function idIsRequired(res, err) {
+    res.status(401);
+    res.json({err: err, log: 'id não pode ser vazio!'});
+}
+
 function emailIsRequired(res, err) {
     res.status(401);
     res.json({err: err, log: 'Email não pode ser vazio!'});
@@ -51,6 +56,12 @@ function roleIsRequired(res, err) {
 function userNotFound(res, err) {
     res.status(404);
     res.json({err: err, log: 'Usuário não encontrado!'});
+}
+
+
+function classNotFound(res, err) {
+    res.status(404);
+    res.json({err: err, log: 'Turma não encontrada!'});
 }
 
 function authenticationRequired(res, err) {
@@ -88,6 +99,11 @@ function classAlreadyExists(res) {
     res.json('Turma já cadastrada!');
 }
 
+function notAuthorized(res, err) {
+    res.status(401);
+    res.json({err: err, log: 'você não possui altorização para esta função!'});
+}
+
 module.exports = {
     ok: ok,
     json: sendJson,
@@ -106,5 +122,8 @@ module.exports = {
     invalidClasscode: invalidClasscode,
     alreadyEnrolledInTheClass: alreadyEnrolledInTheClass,
     isNotA: isNotA,
-    classAlreadyExists: classAlreadyExists
+    classAlreadyExists: classAlreadyExists,
+    notAuthorized: notAuthorized,
+    idIsRequired: idIsRequired,
+    classNotFound: classNotFound
 };
