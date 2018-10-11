@@ -111,7 +111,6 @@ async function updateClass(req, res) {
 }
 
 
-
 module.exports = {
     getClasses: getClasses,
     addClass: addClass,
