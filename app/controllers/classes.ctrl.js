@@ -61,8 +61,6 @@ async function addClass(req, res, next) {
     }
 }
 
-
-
 async function deleteClass(req, res) {
     try {
         var user = await Handles.getUserOfHeaderAuthJWT(req, res);
@@ -88,8 +86,35 @@ async function deleteClass(req, res) {
     }
 }
 
+async function updateClass(req, res) {
+    try {
+        var user = await Handles.getUserOfHeaderAuthJWT(req, res);
+
+        if (user.role !== "professor")
+            Rest.notAuthorized(res, true);
+
+        if (isEmpty(req.body._id))
+            Rest.idIsRequired(res, true);
+
+        await Classes.findOneAndUpdate({_id: req.body._id, teacherId: user._id}, req.body, {new: true}).then((updated) => {
+            if (!updated)
+                Rest.classNotFound(res, true);
+            else
+                Rest.ok(res, updated);
+        }).catch((err) => {
+            Rest.notAuthorized(res, err);
+        });
+
+    } catch(err) {
+        Rest.somethingWentWrong(res, err);
+    }
+}
+
+
+
 module.exports = {
     getClasses: getClasses,
     addClass: addClass,
-    deleteClass: deleteClass
+    deleteClass: deleteClass,
+    updateClass: updateClass
 };
