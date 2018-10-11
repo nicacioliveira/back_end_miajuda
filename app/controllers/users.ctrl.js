@@ -147,11 +147,29 @@ async function getMyClasses(req, res) {
     }
 }
 
+async function updateUser(req, res) {
+    try {
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
+
+        Users.findOneAndUpdate({_id: user._id}, req.body, {new: true}).then((updated) => {
+            if(!updated)
+                Rest.userNotFound(res, true);
+            else
+                Rest.ok(res, { name: updated.name, email: updated.email, role: updated.role });
+        }).catch((err) => {
+            Rest.somethingWentWrong(res, err);
+        });
+    } catch(err) {
+        Rest.somethingWentWrong(res, err);
+    }
+}
+
 module.exports = {
     login: login,
     getUsers: getUsers,
     addUser: addUser,
     deleteUser: deleteUser,
     joinAClass: joinAClass,
-    getMyClasses: getMyClasses
+    getMyClasses: getMyClasses,
+    updateUser: updateUser
 };

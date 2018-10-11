@@ -9,5 +9,6 @@ usersRoute.get('/classes' ,usersCtrl.getMyClasses);
 usersRoute.post('/', usersCtrl.addUser);
 usersRoute.delete('/:id', usersCtrl.deleteUser);
 usersRoute.post('/joinAClass', usersCtrl.joinAClass);
+usersRoute.put('/', usersCtrl.updateUser);
 
 module.exports = usersRoute;
