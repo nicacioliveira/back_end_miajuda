@@ -54,14 +54,6 @@ async function deleteUser(req, res) {
     }
 }
 
-async function generateToken(req, res) {
-    try {
-        TokenGenerator.generateToken(req, res);
-    } catch (err) {
-        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
-    }
-};
-
 async function joinAClass(req, res) {
     try {
         var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
@@ -94,35 +86,25 @@ async function joinAClass(req, res) {
 
 async function getMyClasses(req, res) {
     try {
-        Users.findOne({ email: req.query.email }).then((user) => {
 
-            if (!user) {
-                Rest.json(res, 500, "Usuário não existe");
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
+        var resp = [];
+
+        Classes.find({}).populate({path: 'teacherId', select:'name'}).exec((err, cls) => {
+            if (err) {
+                Rest.json(res, 500, {err: err, log: 'Algo deu errado.'});
             } else {
-                var resp = [];
-                Classes.find({}).populate({
-                    path: 'teacherId',
-                    select:
-                        'name'
-                }).exec((err, cls) => {
-                    if (err)
-                        Rest.json(res, 500, "Algo deu errado");
-                    else {
-                        cls.map(c => {
-                            if (c.students.indexOf(req.query.email) !== -1) {
-                                    resp.push(c);
-                            }
-                        });
-                        Rest.json(res, 200, resp);
+                cls.map(c => {
+                    if (c.students.indexOf(user._id) !== -1) {
+                        resp.push(c);
                     }
                 });
+                Rest.json(res, 200, resp);
             }
-        })
-            .catch((err) => {
-                Rest.json(res, 500, "Usuário não existe");
-            })
+        });
+        
     } catch (err) {
-        Rest.json(res, 500, { err: err, msg: "Problema interno no servidor." });
+        Rest.json(res, 500, { err: err, log: "Problema interno no servidor." });
     }
 }
 
@@ -130,7 +112,6 @@ module.exports = {
     getUsers: getUsers,
     addUser: addUser,
     deleteUser: deleteUser,
-    generateToken: generateToken,
     joinAClass: joinAClass,
     getMyClasses: getMyClasses
 };

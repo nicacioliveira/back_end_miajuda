@@ -8,7 +8,6 @@ usersRoute.get('/', usersCtrl.getUsers);
 usersRoute.get('/classes' ,usersCtrl.getMyClasses);
 usersRoute.post('/', usersCtrl.addUser);
 usersRoute.delete('/:id', usersCtrl.deleteUser);
-usersRoute.post('/generateToken', usersCtrl.generateToken);
 usersRoute.post('/joinAClass', usersCtrl.joinAClass);
 
 module.exports = usersRoute;
