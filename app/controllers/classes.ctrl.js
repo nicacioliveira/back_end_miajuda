@@ -114,6 +114,9 @@ async function removeStudentFromClass(req, res) {
     try {
         var user = await Handles.getUserOfHeaderAuthJWT(req, res);
 
+        if (isEmpty(req.body.studentId))
+            Rest.idIsRequired(res, true);
+
         Classes.findOneAndUpdate(
             { _id: req.params.classId, teacherId : user._id },
             { $pull: { students: req.body.studentId } },
