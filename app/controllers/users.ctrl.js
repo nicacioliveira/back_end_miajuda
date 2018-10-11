@@ -63,45 +63,30 @@ async function generateToken(req, res) {
 };
 
 async function joinAClass(req, res) {
-
     try {
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
 
-        var user = await Handlers.getUserOfHeaderAuthJWT(req);
-        console.log(user);
-        Rest.json(res, 200, user);
-        /*
-        await Tokens.findOne({ token: req.body.token })
-            .then((tokenObj) => {
-                //verify token
-                var checkToken = TokenGenerator.checkToken(tokenObj);
-                if (checkToken.err)
-                    Rest.json(res, 500, checkToken.err);
+        if (!req.body.code)
+            Rest.json(res, 404, {err: true, log: "Código vazio!"})
+        
+        var alreadyRegistered = await Classes.find({code: req.body.code, students: [user._id] });
 
-                // Remember to remove jwt from body
-                const user = Authenticator.decodeJWT(req.body.jwt);
+        if (alreadyRegistered.length !== 0) {
+            Rest.json(res, 200, {err: true, log: "Você ja está matriculado nessa turma!"});
+        } else {
+            Classes.findOneAndUpdate(
+                {code: req.body.code},
+                {$push: {students: user._id}},
+                {mew: true}
+            ).then((newClass) => {
+                if(!newClass)
+                    Rest.json(res, 404, {err: err, log: "Código inválido!"})
 
-                Users.findOne({ _id: user.id }).then((user) => {
-                    if (!user) {
-                        Rest.json(res, 500, "Usuário não existe");
-                    } else {
-                        //update class
-                        Classes.findOneAndUpdate(
-                            { _id: tokenObj.class_id },
-                            { $push: { students: user.email } },
-                            { new: true },
-                            (err, Class) => {
-                                if (err)
-                                    Rest.json(res, 500, "Algo deu errado");
-                                else
-                                    Rest.json(res, 200, Class);
-                            });
-                    }
-                }).catch();
-            })
-            .catch((err) => {
-                Rest.json(res, 500, "Token não existe");
+                Rest.json(res, 200, "Matrícula em turma efeturada com sucesso!")
+            }).catch((err) => {
+                Rest.json(res, 404, {err: err, log: "Código inválido!"})
             });
-            */
+        }
     } catch (err) {
         Rest.serverError(res, { err: err, log: "Problema interno no servidor." });
     }

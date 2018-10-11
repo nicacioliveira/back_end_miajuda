@@ -17,8 +17,8 @@ const classSchema = Schema({
         type: String,
         unique: true
     },
-    students : [String],
-    monitors : [String]
+    students : [Schema.Types.ObjectId],
+    monitors : [Schema.Types.ObjectId]
 
 }, {collection : 'classes'});
 
