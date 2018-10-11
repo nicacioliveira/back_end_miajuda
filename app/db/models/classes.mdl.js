@@ -8,11 +8,17 @@ const classSchema = Schema({
         type: String
     },
     teacherId: {
+        required: true,
         type: Schema.Types.ObjectId,
         ref: "Users"
     },
-    students : [String],
-    monitors : [String]
+    code: {
+        require: true,
+        type: String,
+        unique: true
+    },
+    students : [{type: Schema.Types.ObjectId, ref:'Users'}],
+    monitors : [{type: Schema.Types.ObjectId, ref:'Users'}]
 
 }, {collection : 'classes'});
 

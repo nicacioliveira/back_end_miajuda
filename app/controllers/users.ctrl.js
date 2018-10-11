@@ -1,10 +1,30 @@
 const Users = require('../db/models/users.mdl');
 const Classes = require('../db/models/classes.mdl');
 const Rest = require('../util/services/rest');
-const Tokens = require('../db/models/tokens.mdl');
 const bcrypt = require('bcryptjs');
 const Time = require('../util/helpers/time');
-const TokenGenerator = require("../util/security/token-generator");
+const Handlers = require('../util/helpers/handlers');
+const Authenticator = require('../util/security/authenticator');
+const {isEmpty} = require('../util/helpers/stringCheckers');
+
+async function login(req, res) {
+    try {
+        await Users.findOne({ email: req.body.email }, (err, user) => {
+            if (!user) {
+                Rest.unregisteredUser(res, true);
+
+            } else if (!bcrypt.compareSync(req.body.password, user.password)) {
+                Rest.wrongPassword(res, true);
+
+            } else {
+                var token = Authenticator.generateJWT(user);
+                Rest.ok(res, { user: { name: user.name, email: user.email, role: user.role }, jwt: token });
+            }
+        });
+    } catch (err) {
+        Rest.somethingWentWrong(res, err);
+    }
+}
 
 async function getUsers(req, res, next) {
     try {
@@ -12,134 +32,144 @@ async function getUsers(req, res, next) {
         var dbUsers = await Users.find();
 
         for (var u of dbUsers) {
-            users.push(u);
+            users.push({name: u.name, email: u.email, role: u.role});
         }
-        Rest.json(res, 200, users);
+        Rest.ok(res, users);
     } catch (err) {
-        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
+        Rest.somethingWentWrong(res, err);
     }
 }
 
 async function addUser(req, res) {
     try {
-        var hashedPassword = bcrypt.hashSync(req.body.password, 8);
 
-        var usr = {
-            name: req.body.name,
-            email: req.body.email,
-            password: hashedPassword,
-            role: req.body.role
-        };
+        if (isEmpty(req.body.name))
+            Rest.nameIsRequired(res, true);
 
-        Users.create(usr).then((user) => {
-            Rest.json(res, 200, { user: user });
-        }).catch((err) => {
-            Rest.json(res, 500, { err: err });
-        });
+        else if (isEmpty(req.body.email))
+            Rest.emailIsRequired(res, true);
+
+        else if (isEmpty(req.body.password))
+            Rest.passwordIsRequired(res, true);
+        
+        else if (isEmpty(req.body.role))
+            Rest.roleIsRequired(res, true);
+
+        else {
+
+            var hashedPassword = bcrypt.hashSync(req.body.password, 8);
+
+            var usr = {
+                name: req.body.name,
+                email: req.body.email,
+                password: hashedPassword,
+                role: req.body.role
+            };
+
+            Users.create(usr).then((user) => {
+                Rest.ok(res, user);
+            }).catch((err) => {
+                if (err.code === 11000)
+                    Rest.userAlreadyExists(res, true);
+                else
+                    Rest.somethingWentWrong(res, err);
+            });
+        }
     } catch (err) {
-        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
+        Rest.somethingWentWrong(res, err);
     }
 }
 
 async function deleteUser(req, res) {
     try {
-        Users.findByIdAndRemove(req.params.id, (err, result) => {
+       await  Users.findByIdAndRemove(req.params.id, (err, result) => {
             if (err) {
-                Rest.json(res, 404, { err: err });
+                Rest.somethingWentWrong(res, true);
             } else {
-                Rest.json(res, 200, "Usuário removido.");
+                Rest.ok(res, true);
             }
         });
     } catch (err) {
-        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
+        Rest.somethingWentWrong(res, err);
     }
 }
 
-async function generateToken(req, res) {
-    try {
-        TokenGenerator.generateToken(req, res);
-    } catch (err) {
-        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
-    }
-};
-
 async function joinAClass(req, res) {
     try {
-        await Tokens.findOne({ token: req.body.token })
-            .then((tokenObj) => {
-                //verify token
-                var checkToken = TokenGenerator.checkToken(tokenObj);
-                if (checkToken.err)
-                    Rest.json(res, 500, checkToken.err);
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
 
-                // Remember to remove jwt from body
-                const user = Authenticator.decodeJWT(req.body.jwt);
+        if (!req.body.code)
+            Rest.classCodeisEmpty(res, true);
+        
+        var alreadyRegistered = await Classes.find({code: req.body.code, students: [user._id] });
 
-                Users.findOne({ _id: user.id }).then((user) => {
-                    if (!user) {
-                        Rest.json(res, 500, "Usuário não existe");
-                    } else {
-                        //update class
-                        Classes.findOneAndUpdate(
-                            { _id: tokenObj.class_id },
-                            { $push: { students: user.email } },
-                            { new: true },
-                            (err, Class) => {
-                                if (err)
-                                    Rest.json(res, 500, "Algo deu errado");
-                                else
-                                    Rest.json(res, 200, Class);
-                            });
-                    }
-                }).catch();
-            })
-            .catch((err) => {
-                Rest.json(res, 500, "Token não existe");
+        if (alreadyRegistered.length !== 0) {
+            Rest.alreadyEnrolledInTheClass(res);
+        } else {
+            Classes.findOneAndUpdate(
+                {code: req.body.code},
+                {$push: {students: user._id}},
+                {mew: true}
+            ).then((newClass) => {
+                if(!newClass)
+                    Rest.invalidClasscode(res, true);
+
+                Rest.ok(res, newClass);
+            }).catch((err) => {
+                Rest.somethingWentWrong(res, err);
             });
+        }
     } catch (err) {
-        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
+        Rest.somethingWentWrong(res, err);
     }
 }
 
 async function getMyClasses(req, res) {
     try {
-        Users.findOne({ email: req.query.email }).then((user) => {
 
-            if (!user) {
-                Rest.json(res, 500, "Usuário não existe");
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
+        var resp = [];
+
+        Classes.find({}).populate({path: 'teacherId', select:'name'}).exec((err, cls) => {
+            if (err) {
+                Rest.somethingWentWrong(res, err);
             } else {
-                var resp = [];
-                Classes.find({}).populate({
-                    path: 'teacherId',
-                    select:
-                        'name'
-                }).exec((err, cls) => {
-                    if (err)
-                        Rest.json(res, 500, "Algo deu errado");
-                    else {
-                        cls.map(c => {
-                            if (c.students.indexOf(req.query.email) !== -1) {
-                                    resp.push(c);
-                            }
-                        });
-                        Rest.json(res, 200, resp);
+                cls.map(c => {
+                    if (c.students.indexOf(user._id) !== -1) {
+                        resp.push(c);
                     }
                 });
+                Rest.ok(res, resp);
             }
-        })
-            .catch((err) => {
-                Rest.json(res, 500, "Usuário não existe");
-            })
+        });
     } catch (err) {
-        Rest.json(res, 500, { err: err, msg: "Problema interno no servidor." });
+        Rest.somethingWentWrong(res, err);
+    }
+}
+
+async function updateUser(req, res) {
+    try {
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
+
+        Users.findOneAndUpdate({_id: user._id}, req.body, {new: true}).then((updated) => {
+            if(!updated)
+                Rest.userNotFound(res, true);
+            else
+                Rest.ok(res, { name: updated.name, email: updated.email, role: updated.role });
+        }).catch((err) => {
+            Rest.somethingWentWrong(res, err);
+        });
+    } catch(err) {
+        Rest.somethingWentWrong(res, err);
     }
 }
 
 module.exports = {
+    login: login,
     getUsers: getUsers,
     addUser: addUser,
     deleteUser: deleteUser,
-    generateToken: generateToken,
     joinAClass: joinAClass,
-    getMyClasses: getMyClasses
+    getMyClasses: getMyClasses,
+    updateUser: updateUser
 };

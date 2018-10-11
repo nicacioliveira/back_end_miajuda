@@ -3,12 +3,12 @@ var express = require('express');
 var usersRoute = express.Router();
 var usersCtrl = require('../../controllers/users.ctrl');
 
-
+usersRoute.post('/login', usersCtrl.login);
 usersRoute.get('/', usersCtrl.getUsers);
-usersRoute.get('/classes', usersCtrl.getMyClasses);
+usersRoute.get('/classes' ,usersCtrl.getMyClasses);
 usersRoute.post('/', usersCtrl.addUser);
 usersRoute.delete('/:id', usersCtrl.deleteUser);
-usersRoute.post('/generateToken', usersCtrl.generateToken);
 usersRoute.post('/joinAClass', usersCtrl.joinAClass);
+usersRoute.put('/', usersCtrl.updateUser);
 
 module.exports = usersRoute;

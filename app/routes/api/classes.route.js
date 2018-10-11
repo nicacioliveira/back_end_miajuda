@@ -6,5 +6,6 @@ var classController = require('../../controllers/classes.ctrl');
 classRouter.get('/', classController.getClasses);
 classRouter.post('/', classController.addClass);
 classRouter.delete('/:id', classController.deleteClass);
+classRouter.put('/', classController.updateClass);
 
 module.exports = classRouter;
