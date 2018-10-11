@@ -8,8 +8,14 @@ const classSchema = Schema({
         type: String
     },
     teacherId: {
+        required: true,
         type: Schema.Types.ObjectId,
         ref: "Users"
+    },
+    code: {
+        require: true,
+        type: String,
+        unique: true
     },
     students : [String],
     monitors : [String]

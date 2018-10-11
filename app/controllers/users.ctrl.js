@@ -1,10 +1,8 @@
 const Users = require('../db/models/users.mdl');
 const Classes = require('../db/models/classes.mdl');
 const Rest = require('../util/services/rest');
-const Tokens = require('../db/models/tokens.mdl');
 const bcrypt = require('bcryptjs');
 const Time = require('../util/helpers/time');
-const TokenGenerator = require("../util/security/token-generator");
 
 async function getUsers(req, res, next) {
     try {
@@ -64,7 +62,7 @@ async function generateToken(req, res) {
 };
 
 async function joinAClass(req, res) {
-    try {
+    /*try {
         await Tokens.findOne({ token: req.body.token })
             .then((tokenObj) => {
                 //verify token
@@ -98,7 +96,7 @@ async function joinAClass(req, res) {
             });
     } catch (err) {
         Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
-    }
+    }*/
 }
 
 async function getMyClasses(req, res) {

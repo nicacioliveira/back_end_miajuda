@@ -35,28 +35,34 @@ async function login(req, res) {
 }
 
 async function verifyJwtToken(req, res, next) {
+
     try {
         var token = req.headers['authorization'];
+
+        console.log(token);
         if (!token)
-            return Rest.json(res, 401, { err: 'Token inexistente.' });
+            Rest.json(res, 401, { err: 'Token inexistente.' });
+        
+        return false;
+        
+        // jwt.verify(token, Config.APP_SECRET, function (err, decoded) {
+        //     if (err)
+        //         return Rest.json(res, 401, { err: 'Falha na autenticação.' });
+            
+        //     var expirationDate = new Date(decoded.exp * 1000);
 
-        jwt.verify(token, Config.APP_SECRET, function (err, decoded) {
-            if (err)
-                return Rest.json(res, 401, { err: 'Falha na autenticação.' });
+        //     if (new Date() > expirationDate) {
+        //         return Rest.json(res, 401, { err: 'Token expirado.' });
+        //     }
 
-            var expirationDate = new Date(decoded.exp * 1000);
+        //     var userId = decoded.id;
 
-            if (new Date() > expirationDate) {
-                return Rest.json(res, 401, { err: 'Token expirado.' });
-            }
-
-            var userId = decoded.id;
-
-            User.findOne({ _id: userId }, function (err, user) {
-                req.user = user;
-                next();
-            });
-        });
+        //     User.findOne({ _id: userId }, function (err, user) {
+        //         req.user = user;
+        //         next();
+        //     });
+        // });
+        
     } catch (err) {
         Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
     }
