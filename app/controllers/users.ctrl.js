@@ -100,24 +100,25 @@ async function joinAClass(req, res) {
 
         if (!req.body.code)
             Rest.classCodeisEmpty(res, true);
+        else {
+            var alreadyRegistered = await Classes.find({code: req.body.code, students: [user._id] });
 
-        var alreadyRegistered = await Classes.find({code: req.body.code, students: [user._id] });
+            if (alreadyRegistered.length !== 0) {
+                Rest.alreadyEnrolledInTheClass(res);
+            } else {
+                Classes.findOneAndUpdate(
+                    {code: req.body.code},
+                    {$push: {students: user._id}},
+                    {mew: true}
+                ).then((newClass) => {
+                    if(!newClass)
+                        Rest.invalidClasscode(res, true);
 
-        if (alreadyRegistered.length !== 0) {
-            Rest.alreadyEnrolledInTheClass(res);
-        } else {
-            Classes.findOneAndUpdate(
-                {code: req.body.code},
-                {$push: {students: user._id}},
-                {mew: true}
-            ).then((newClass) => {
-                if(!newClass)
-                    Rest.invalidClasscode(res, true);
-
-                Rest.ok(res, newClass);
-            }).catch((err) => {
-                Rest.somethingWentWrong(res, err);
-            });
+                    Rest.ok(res, newClass);
+                }).catch((err) => {
+                    Rest.somethingWentWrong(res, err);
+                });
+            }
         }
     } catch (err) {
         Rest.somethingWentWrong(res, err);
