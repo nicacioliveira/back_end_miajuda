@@ -29,7 +29,7 @@ async function addClass(req, res, next) {
     try {
 
         var user = await Handles.getUserOfHeaderAuthJWT(req, res);
-        
+
         if (user.role != "professor")
             Rest.isNotA(res, true, "professor")
 
@@ -37,7 +37,7 @@ async function addClass(req, res, next) {
             Rest.nameIsRequired(res, true);
         else {
             var classCode = await classcodeGenerator.genUniqueCode();
-        
+
             var newClass = {
                 name: req.body.name,
                 teacherId: user._id,
@@ -79,7 +79,7 @@ async function deleteClass(req, res) {
             }).catch((err) => {
                 Rest.notAuthorized(res, err);
             });
-            
+
         }
     } catch (err) {
         Rest.somethingWentWrong(res, err);
@@ -110,11 +110,30 @@ async function updateClass(req, res) {
     }
 }
 
+async function removeStudentFromClass(req, res) {
+    try {
+        var user = await Handles.getUserOfHeaderAuthJWT(req, res);
 
+        Classes.findOneAndUpdate(
+            { _id: req.params.classId, teacherId : user._id },
+            { $pull: { students: req.body.studentId } },
+            { new: true },
+            (err, Class) => {
+                if (err) {
+                    Rest.somethingWentWrong(res, err);
+                } else {
+                    Rest.ok(res, true);
+                }
+            });
+    } catch (err) {
+        Rest.somethingWentWrong(res, err);
+    }
+}
 
 module.exports = {
     getClasses: getClasses,
     addClass: addClass,
     deleteClass: deleteClass,
-    updateClass: updateClass
+    updateClass: updateClass,
+    removeStudentFromClass: removeStudentFromClass
 };
