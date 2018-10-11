@@ -5,23 +5,22 @@ const Rest = require('../services/rest');
 function getUserOfHeaderAuthJWT(req, res) {
     var jwt = req.headers['authorization'];
     if (!jwt) {
-        Rest.json(res, 404, "Autenticação requerida!");
+        Rest.authenticationRequired(res, true);
     }
 
     var authDecoded = authenticator.decodeJWT(jwt);
 
     var user = Users.findOne({_id: authDecoded.id}, (err, user) => {
         if (err) 
-            Rest.json(res, 404, {err: err, log: "Algo deu errado"})
+            Rest.somethingWentWrong(res, err);
         
         if (!user)
-            Rest.json(res, 404, {err: null, log: "Usuário não encontrado"});
+            Rest.userNotFound(res, true);
 
     });
 
     return user;
 }
-
 
 module.exports = {
     getUserOfHeaderAuthJWT: getUserOfHeaderAuthJWT
