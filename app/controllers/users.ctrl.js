@@ -3,6 +3,7 @@ const Classes = require('../db/models/classes.mdl');
 const Rest = require('../util/services/rest');
 const bcrypt = require('bcryptjs');
 const Time = require('../util/helpers/time');
+const Handlers = require('../util/helpers/handlers');
 
 async function getUsers(req, res, next) {
     try {
@@ -62,7 +63,13 @@ async function generateToken(req, res) {
 };
 
 async function joinAClass(req, res) {
-    /*try {
+
+    try {
+
+        var user = await Handlers.getUserOfHeaderAuthJWT(req);
+        console.log(user);
+        Rest.json(res, 200, user);
+        /*
         await Tokens.findOne({ token: req.body.token })
             .then((tokenObj) => {
                 //verify token
@@ -94,9 +101,10 @@ async function joinAClass(req, res) {
             .catch((err) => {
                 Rest.json(res, 500, "Token não existe");
             });
+            */
     } catch (err) {
-        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
-    }*/
+        Rest.serverError(res, { err: err, log: "Problema interno no servidor." });
+    }
 }
 
 async function getMyClasses(req, res) {

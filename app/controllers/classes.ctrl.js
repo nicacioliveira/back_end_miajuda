@@ -27,6 +27,9 @@ async function addClass(req, res, next) {
 
         var user = await Handles.getUserOfHeaderAuthJWT(req, res);
         
+        if (user.role != "professor")
+            Rest.json(res, 404, {err: null, log: "Usuário não é um professor!"});
+
         if (!req.body.name)
             Rest.json(res, 404, {err: true, log: "O campo nome não pode ser vazio!"})
 

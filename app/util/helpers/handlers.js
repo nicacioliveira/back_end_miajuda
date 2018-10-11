@@ -17,13 +17,11 @@ function getUserOfHeaderAuthJWT(req, res) {
         if (!user)
             Rest.json(res, 404, {err: null, log: "Usuário não encontrado"});
 
-        if (user.role != "professor")
-            Rest.json(res, 404, {err: null, log: "Usuário não é um professor!"});
-
     });
 
     return user;
 }
+
 
 module.exports = {
     getUserOfHeaderAuthJWT: getUserOfHeaderAuthJWT
