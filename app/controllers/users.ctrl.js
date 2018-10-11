@@ -15,7 +15,7 @@ async function getUsers(req, res, next) {
         }
         Rest.json(res, 200, users);
     } catch (err) {
-        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
+        Rest.serverError(res, { err: err, log: "Problema interno no servidor." });
     }
 }
 
@@ -36,7 +36,7 @@ async function addUser(req, res) {
             Rest.json(res, 500, { err: err });
         });
     } catch (err) {
-        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
+        Rest.serverError(res, { err: err, log: "Problema interno no servidor." });
     }
 }
 
@@ -50,7 +50,7 @@ async function deleteUser(req, res) {
             }
         });
     } catch (err) {
-        Rest.serverError(res, { log: err, msg: "Problema interno no servidor." });
+        Rest.serverError(res, { err: err, log: "Problema interno no servidor." });
     }
 }
 

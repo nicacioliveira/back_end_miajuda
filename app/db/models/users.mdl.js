@@ -15,7 +15,7 @@ const userSchema = Schema({
     }, role: {
         required: true,
         type: String,
-        enum: ['aluno', 'monitor', 'professor'],
+        enum: ['aluno', 'professor'],
         default: 'aluno'
     }
 }, {collection : 'users'});
