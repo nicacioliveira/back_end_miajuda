@@ -32,7 +32,7 @@ async function getUsers(req, res, next) {
         var dbUsers = await Users.find();
 
         for (var u of dbUsers) {
-            users.push(u);
+            users.push({name: u.name, email: u.email, role: u.role});
         }
         Rest.ok(res, users);
     } catch (err) {
