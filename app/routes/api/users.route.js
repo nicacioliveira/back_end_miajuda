@@ -10,5 +10,6 @@ usersRoute.post('/', usersCtrl.addUser);
 usersRoute.delete('/:id', usersCtrl.deleteUser);
 usersRoute.post('/joinAClass', usersCtrl.joinAClass);
 usersRoute.put('/', usersCtrl.updateUser);
+usersRoute.delete('/quitClass/:classId', usersCtrl.quitFromClass);
 
 module.exports = usersRoute;

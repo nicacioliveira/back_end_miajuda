@@ -51,7 +51,7 @@ async function addUser(req, res) {
 
         else if (isEmpty(req.body.password))
             Rest.passwordIsRequired(res, true);
-        
+
         else if (isEmpty(req.body.role))
             Rest.roleIsRequired(res, true);
 
@@ -100,24 +100,25 @@ async function joinAClass(req, res) {
 
         if (!req.body.code)
             Rest.classCodeisEmpty(res, true);
-        
-        var alreadyRegistered = await Classes.find({code: req.body.code, students: [user._id] });
+        else {
+            var alreadyRegistered = await Classes.find({code: req.body.code, students: [user._id] });
 
-        if (alreadyRegistered.length !== 0) {
-            Rest.alreadyEnrolledInTheClass(res);
-        } else {
-            Classes.findOneAndUpdate(
-                {code: req.body.code},
-                {$push: {students: user._id}},
-                {mew: true}
-            ).then((newClass) => {
-                if(!newClass)
-                    Rest.invalidClasscode(res, true);
+            if (alreadyRegistered.length !== 0) {
+                Rest.alreadyEnrolledInTheClass(res);
+            } else {
+                Classes.findOneAndUpdate(
+                    {code: req.body.code},
+                    {$push: {students: user._id}},
+                    {mew: true}
+                ).then((newClass) => {
+                    if(!newClass)
+                        Rest.invalidClasscode(res, true);
 
-                Rest.ok(res, newClass);
-            }).catch((err) => {
-                Rest.somethingWentWrong(res, err);
-            });
+                    Rest.ok(res, newClass);
+                }).catch((err) => {
+                    Rest.somethingWentWrong(res, err);
+                });
+            }
         }
     } catch (err) {
         Rest.somethingWentWrong(res, err);
@@ -164,6 +165,25 @@ async function updateUser(req, res) {
     }
 }
 
+async function quitFromClass(req, res) {
+    try {
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
+
+        Classes.findOneAndUpdate(
+            { _id: req.params.classId },
+            { $pull: { students: user._id } },
+            { new: true },
+            (err, Class) => {
+                if (err)
+                    Rest.somethingWentWrong(res, err);
+                else
+                    Rest.ok(res, true);
+            });
+    } catch (err) {
+        Rest.somethingWentWrong(res, err);
+    }
+}
+
 module.exports = {
     login: login,
     getUsers: getUsers,
@@ -171,5 +191,6 @@ module.exports = {
     deleteUser: deleteUser,
     joinAClass: joinAClass,
     getMyClasses: getMyClasses,
-    updateUser: updateUser
+    updateUser: updateUser,
+    quitFromClass: quitFromClass
 };

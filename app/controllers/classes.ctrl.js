@@ -29,15 +29,14 @@ async function addClass(req, res, next) {
     try {
 
         var user = await Handles.getUserOfHeaderAuthJWT(req, res);
-        
+
         if (user.role != "professor")
             Rest.isNotA(res, true, "professor")
-
         else if (isEmpty(req.body.name))
             Rest.nameIsRequired(res, true);
         else {
             var classCode = await classcodeGenerator.genUniqueCode();
-        
+
             var newClass = {
                 name: req.body.name,
                 teacherId: user._id,
@@ -70,7 +69,6 @@ async function deleteClass(req, res) {
         else if (isEmpty(req.query.id))
             Rest.idIsRequired(res, true);
         else {
-
             Classes.findOneAndDelete({_id: req.query.id, teacherId: user._id}).then((resp) => {
                 if (!resp)
                     Rest.classNotFound(res, true);
@@ -92,28 +90,51 @@ async function updateClass(req, res) {
 
         if (user.role !== "professor")
             Rest.notAuthorized(res, true);
-
-        if (isEmpty(req.body._id))
+        else if (isEmpty(req.body._id))
             Rest.idIsRequired(res, true);
-
-        await Classes.findOneAndUpdate({_id: req.body._id, teacherId: user._id}, req.body, {new: true}).then((updated) => {
-            if (!updated)
-                Rest.classNotFound(res, true);
-            else
-                Rest.ok(res, updated);
-        }).catch((err) => {
-            Rest.notAuthorized(res, err);
-        });
-
-    } catch(err) {
+        else {
+            await Classes.findOneAndUpdate({_id: req.body._id, teacherId: user._id}, req.body, {new: true}).then((updated) => {
+                if (!updated)
+                    Rest.classNotFound(res, true);
+                else
+                    Rest.ok(res, updated);
+            }).catch((err) => {
+                Rest.notAuthorized(res, err);
+            });
+        }
+        } catch(err) {
         Rest.somethingWentWrong(res, err);
     }
 }
 
+async function removeStudentFromClass(req, res) {
+    try {
+        var user = await Handles.getUserOfHeaderAuthJWT(req, res);
+
+        if (isEmpty(req.body.studentId))
+            Rest.idIsRequired(res, true);
+        else {
+            Classes.findOneAndUpdate(
+                { _id: req.params.classId, teacherId : user._id },
+                { $pull: { students: req.body.studentId } },
+                { new: true },
+                (err, Class) => {
+                    if (err) {
+                        Rest.somethingWentWrong(res, err);
+                    } else {
+                        Rest.ok(res, true);
+                    }
+                });
+        }
+    } catch (err) {
+        Rest.somethingWentWrong(res, err);
+    }
+}
 
 module.exports = {
     getClasses: getClasses,
     addClass: addClass,
     deleteClass: deleteClass,
-    updateClass: updateClass
+    updateClass: updateClass,
+    removeStudentFromClass: removeStudentFromClass
 };
