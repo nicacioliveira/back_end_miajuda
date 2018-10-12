@@ -68,6 +68,7 @@
  *    tags:
  *      - User
  *    summary: Get all classes from current user
+ *    description: Works for teachers and students.
  *    security:
  *      - JWT: [admin]   # Use OAuth with a different scope
  *    produces:

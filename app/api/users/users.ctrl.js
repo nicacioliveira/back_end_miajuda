@@ -136,8 +136,14 @@ async function getMyClasses(req, res) {
                 Rest.somethingWentWrong(res, err);
             } else {
                 cls.map(c => {
-                    if (c.teacherId != null && typeof c.teacherId !== null){
-                        if (String(c.teacherId._id) == String(user._id)) {
+                    if (user.role === 'professor') {
+                        if (c.teacherId != null && typeof c.teacherId !== null) {
+                            if (String(c.teacherId._id) == String(user._id)) {
+                                resp.push(c);
+                            }
+                        }
+                    } else {
+                        if (c.students.indexOf(user._id) !== -1) {
                             resp.push(c);
                         }
                     }
