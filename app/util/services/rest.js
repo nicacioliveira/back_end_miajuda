@@ -101,7 +101,7 @@ function classAlreadyExists(res) {
 
 function notAuthorized(res, err) {
     res.status(401);
-    res.json({err: err, log: 'você não possui altorização para esta função!'});
+    res.json({err: err, log: 'você não possui autorização para esta função!'});
 }
 
 module.exports = {
