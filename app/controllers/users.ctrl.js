@@ -130,14 +130,16 @@ async function getMyClasses(req, res) {
 
         var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
         var resp = [];
-
+        
         Classes.find({}).populate({path: 'teacherId', select:'name'}).exec((err, cls) => {
             if (err) {
                 Rest.somethingWentWrong(res, err);
             } else {
                 cls.map(c => {
-                    if (c.students.indexOf(user._id) !== -1) {
-                        resp.push(c);
+                    if (c.teacherId != null && typeof c.teacherId !== null){
+                        if (String(c.teacherId._id) == String(user._id)) {
+                            resp.push(c);
+                        }
                     }
                 });
                 Rest.ok(res, resp);
