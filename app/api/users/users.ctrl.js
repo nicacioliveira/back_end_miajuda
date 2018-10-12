@@ -185,7 +185,7 @@ async function quitFromClass(req, res) {
                 if (err)
                     Rest.somethingWentWrong(res, err);
                 else
-                    Rest.ok(res, true);
+                    Rest.ok(res, {value: true});
             });
     } catch (err) {
         Rest.somethingWentWrong(res, err);
