@@ -31,7 +31,7 @@ beforeAll(function (done) {
   })
 });
 
-test('POST /user', ()=>{
+test('POST /users', ()=>{
   return request(address)
   .post('/api/users')
   .send({

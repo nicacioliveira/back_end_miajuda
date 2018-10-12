@@ -1,11 +1,11 @@
-const Users = require('../db/models/users.mdl');
-const Classes = require('../db/models/classes.mdl');
-const Rest = require('../util/services/rest');
+const Users = require('../../db/models/users.mdl');
+const Classes = require('../../db/models/classes.mdl');
+const Rest = require('../../util/services/rest');
 const bcrypt = require('bcryptjs');
-const Time = require('../util/helpers/time');
-const Handlers = require('../util/helpers/handlers');
-const Authenticator = require('../util/security/authenticator');
-const {isEmpty} = require('../util/helpers/stringCheckers');
+const Time = require('../../util/helpers/time');
+const Handlers = require('../../util/helpers/handlers');
+const Authenticator = require('../../util/security/authenticator');
+const {isEmpty} = require('../../util/helpers/stringCheckers');
 
 async function login(req, res) {
     try {

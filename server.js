@@ -3,15 +3,18 @@ var cors = require('cors');
 var app = express();
 var Config = require('./app/util/constants/config');
 const bodyParser = require('body-parser');
+const swaggerConfig = require('./app/util/constants/swagger');
 
 require('./app/db/db');
 
-const routes = require('./app/routes/index.route');
+const routes = require('./app/index.route');
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '1mb' }));
 app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
 app.use('/api', routes);
+swaggerConfig(app);
+
 
 const PORT = Config.PORT || 8080;
 
