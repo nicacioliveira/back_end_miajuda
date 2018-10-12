@@ -1,7 +1,7 @@
 var express = require('express');
 //autenticator aqui
 var usersRoute = express.Router();
-var usersCtrl = require('../../controllers/users.ctrl');
+var usersCtrl = require('./users.ctrl');
 
 usersRoute.post('/login', usersCtrl.login);
 usersRoute.get('/', usersCtrl.getUsers);

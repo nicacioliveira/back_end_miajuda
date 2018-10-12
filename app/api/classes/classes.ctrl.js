@@ -1,9 +1,9 @@
-const Classes = require('../db/models/classes.mdl');
-const Rest = require('../util/services/rest');
-const classcodeGenerator = require('../util/security/classCodeGenerator');
-const Users = require('../db/models/users.mdl');
-const Handles = require('../util/helpers/handlers');
-const {isEmpty} = require('../util/helpers/stringCheckers');
+const Classes = require('../../db/models/classes.mdl');
+const Rest = require('../../util/services/rest');
+const classcodeGenerator = require('../../util/security/classCodeGenerator');
+const Users = require('../../db/models/users.mdl');
+const Handles = require('../../util/helpers/handlers');
+const {isEmpty} = require('../../util/helpers/stringCheckers');
 
 async function getClasses(req, res, next) {
     try {
@@ -66,10 +66,10 @@ async function deleteClass(req, res) {
 
         if (user.role !== "professor")
             Rest.notAuthorized(res, true);
-        else if (isEmpty(req.query.id))
+        else if (isEmpty(req.params.id))
             Rest.idIsRequired(res, true);
         else {
-            Classes.findOneAndDelete({_id: req.query.id, teacherId: user._id}).then((resp) => {
+            Classes.findOneAndDelete({_id: req.params.id, teacherId: user._id}).then((resp) => {
                 if (!resp)
                     Rest.classNotFound(res, true);
                 else
