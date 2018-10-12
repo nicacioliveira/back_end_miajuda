@@ -12,7 +12,7 @@ module.exports = () => {
             version: '0.0.1',
             description: '',
         },
-        host: 'localhost:8080',
+        host: 'ec2-18-231-117-104.sa-east-1.compute.amazonaws.com:8080',
         basePath: '/api',
         securityDefinitions: {
             JWT: {
