@@ -39,10 +39,16 @@ async function addClass(req, res, next) {
 
             var newClass = {
                 name: req.body.name,
+                optional_email: req.body.optional_email || '',
+                schedule: req.body.schedule || '',
+                number: req.body.number || '',
+                semester: req.body.semester || '',
+                office_hours: req.body.office_hours || '',
+                info: req.body.info || '',
                 teacherId: user._id,
                 code: classCode,
-                students: req.body.students,
-                monitors: req.body.monitors
+                students: req.body.students || [],
+                monitors: req.body.monitors || []
             }
 
             await Classes.create(newClass).then((classresp) => {
