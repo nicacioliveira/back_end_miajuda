@@ -156,6 +156,10 @@ async function getMyClasses(req, res) {
     }
 }
 
+async function getMyPosts(req, res) {
+    Rest.ok("getMyPosts", "getMyPosts");
+}
+
 async function updateUser(req, res) {
     try {
         var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
@@ -199,6 +203,7 @@ module.exports = {
     deleteUser: deleteUser,
     joinAClass: joinAClass,
     getMyClasses: getMyClasses,
+    getMyPosts: getMyPosts,
     updateUser: updateUser,
     quitFromClass: quitFromClass
 };

@@ -6,7 +6,8 @@ CRUD e verificar se pode ou nao mexer
 const postSchema = Schema({
     author: {
         require: true,
-        type: Schema.Types.ObjectId, ref:'Users'
+        type: Schema.Types.ObjectId, 
+        ref:'Users'
     },
     title: {
         unique: true,
@@ -14,13 +15,15 @@ const postSchema = Schema({
         type: String
     },
     text_body: {
-        type: String
+        type: String,
+        default: ''
     },
     createdAt: {
         require: true,
-        type: Schema.Types.Date
+        type: Date,
+        default: Date.now
     }
 
 }, {collection : 'posts'});
 
-module.exports = mongoose.model('Posts', classSchema);
+module.exports = mongoose.model('Posts', postSchema);
