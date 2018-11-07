@@ -195,19 +195,19 @@ test('POST /joinAClass', ()=>{
 });
 
 
-// test('DELETE /classes/leave/aluno', ()=>{
-//   return request(address)
-//   .delete('/api/classes/student/' + classId)
-//   .set('Authorization',jwtAlunoToken)
-//   .then(response=>{
-//       expect(response.status).toBe(200);
-//   })
-//   .catch(fail);
-// });
+test('DELETE /classes/leave/aluno', ()=>{
+   return request(address)
+   .delete('/api/users/quitClass/' + classId)
+   .set('Authorization',jwtAlunoToken)
+   .then(response=>{
+       expect(response.status).toBe(200);
+   })
+   .catch(fail);
+});
 
-test('DELETE /users/professor', ()=>{
+test('DELETE /class', ()=>{
   return request(address)
-  .delete('/api/classes/deleteClass?id=' + classId)
+  .delete('/api/classes/' + classId)
   .set('Authorization',jwtAuthToken)
   .then(response=>{
       expect(response.status).toBe(200);
