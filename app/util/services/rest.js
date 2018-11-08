@@ -64,6 +64,11 @@ function classNotFound(res, err) {
     res.json({err: err, log: 'Turma não encontrada!'});
 }
 
+function postNotFound(res, err) {
+    res.status(404);
+    res.json({err: err, log: 'Postagem não encontrada!'});
+}
+
 function authenticationRequired(res, err) {
     res.status(401);
     res.json({err: err, log: 'Autenticação requerida!'});
@@ -125,5 +130,6 @@ module.exports = {
     classAlreadyExists: classAlreadyExists,
     notAuthorized: notAuthorized,
     idIsRequired: idIsRequired,
-    classNotFound: classNotFound
+    classNotFound: classNotFound,
+    postNotFound: postNotFound
 };

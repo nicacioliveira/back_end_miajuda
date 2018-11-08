@@ -3,8 +3,25 @@ const Schema = mongoose.Schema;
 
 const classSchema = Schema({
     name: {
-        unique: true,
         required : true,
+        type: String
+    },
+    optional_email: {
+        type: String
+    },
+    schedule: {
+        type: String
+    },
+    number: {
+        type: String
+    },
+    semester: {
+        type: String
+    },
+    office_hours: {
+        type: String
+    },
+    info: {
         type: String
     },
     teacherId: {
@@ -13,12 +30,13 @@ const classSchema = Schema({
         ref: "Users"
     },
     code: {
-        require: true,
+        required: true,
         type: String,
         unique: true
     },
     students : [{type: Schema.Types.ObjectId, ref:'Users'}],
-    monitors : [{type: Schema.Types.ObjectId, ref:'Users'}]
+    monitors : [{type: Schema.Types.ObjectId, ref:'Users'}],
+
 
 }, {collection : 'classes'});
 
