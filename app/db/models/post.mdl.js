@@ -1,16 +1,17 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-/*
-CRUD e verificar se pode ou nao mexer
-*/
 const postSchema = Schema({
     author: {
         require: true,
         type: Schema.Types.ObjectId, 
         ref:'Users'
     },
+    class: {
+        require: true,
+        type: Schema.Types.ObjectId, 
+        ref:'Classes'
+    },
     title: {
-        unique: true,
         required : true,
         type: String
     },

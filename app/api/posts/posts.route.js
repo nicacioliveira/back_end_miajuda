@@ -7,5 +7,4 @@ postsRoute.get('/', postsCtrl.getPosts);
 postsRoute.put('/', postsCtrl.updatePost);
 postsRoute.delete('/:id', postsCtrl.deletePost);
 
-
 module.exports = postsRoute;

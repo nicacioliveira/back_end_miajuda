@@ -2,17 +2,20 @@ const Classes = require('../../db/models/classes.mdl');
 const Rest = require('../../util/services/rest');
 const classcodeGenerator = require('../../util/security/classCodeGenerator');
 const Users = require('../../db/models/users.mdl');
-const Handles = require('../../util/helpers/handlers');
-const {isEmpty} = require('../../util/helpers/stringCheckers');
+const Posts = require('../../db/models/post.mdl');
+const Handlers = require('../../util/helpers/handlers');
+const { isEmpty } = require('../../util/helpers/stringCheckers');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 async function getClasses(req, res, next) {
     try {
         var classes = [];
         var dbClasses = await Classes.find()
-        .populate({
-            path: 'teacherId',
-            select:'name'
-        });
+            .populate({
+                path: 'teacherId',
+                select: 'name'
+            });
 
         for (var c of dbClasses) {
             classes.push(c);
@@ -28,7 +31,7 @@ async function getClasses(req, res, next) {
 async function addClass(req, res, next) {
     try {
 
-        var user = await Handles.getUserOfHeaderAuthJWT(req, res);
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
 
         if (user.role != "professor")
             Rest.isNotA(res, true, "professor")
@@ -68,14 +71,14 @@ async function addClass(req, res, next) {
 
 async function deleteClass(req, res) {
     try {
-        var user = await Handles.getUserOfHeaderAuthJWT(req, res);
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
 
         if (user.role !== "professor")
             Rest.notAuthorized(res, true);
         else if (isEmpty(req.params.id))
             Rest.idIsRequired(res, true);
         else {
-            Classes.findOneAndDelete({_id: req.params.id, teacherId: user._id}).then((resp) => {
+            Classes.findOneAndDelete({ _id: req.params.id, teacherId: user._id }).then((resp) => {
                 if (!resp)
                     Rest.classNotFound(res, true);
                 else
@@ -83,7 +86,7 @@ async function deleteClass(req, res) {
             }).catch((err) => {
                 Rest.notAuthorized(res, err);
             });
-            
+
         }
     } catch (err) {
         Rest.somethingWentWrong(res, err);
@@ -92,14 +95,14 @@ async function deleteClass(req, res) {
 
 async function updateClass(req, res) {
     try {
-        var user = await Handles.getUserOfHeaderAuthJWT(req, res);
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
 
         if (user.role !== "professor")
             Rest.notAuthorized(res, true);
         else if (isEmpty(req.body._id))
             Rest.idIsRequired(res, true);
         else {
-            await Classes.findOneAndUpdate({_id: req.body._id, teacherId: user._id}, req.body, {new: true}).then((updated) => {
+            await Classes.findOneAndUpdate({ _id: req.body._id, teacherId: user._id }, req.body, { new: true }).then((updated) => {
                 if (!updated)
                     Rest.classNotFound(res, true);
                 else
@@ -108,20 +111,20 @@ async function updateClass(req, res) {
                 Rest.notAuthorized(res, err);
             });
         }
-        } catch(err) {
+    } catch (err) {
         Rest.somethingWentWrong(res, err);
     }
 }
 
 async function removeStudentFromClass(req, res) {
     try {
-        var user = await Handles.getUserOfHeaderAuthJWT(req, res);
+        var user = await Handlers.getUserOfHeaderAuthJWT(req, res);
 
         if (isEmpty(req.body.studentId))
             Rest.idIsRequired(res, true);
         else {
             Classes.findOneAndUpdate(
-                { _id: req.params.classId, teacherId : user._id },
+                { _id: req.params.classId, teacherId: user._id },
                 { $pull: { students: req.body.studentId } },
                 { new: true },
                 (err, Class) => {
@@ -137,10 +140,25 @@ async function removeStudentFromClass(req, res) {
     }
 }
 
+async function getPosts(req, res) {
+    //body classId
+    try {
+        await Handlers.getUserOfHeaderAuthJWT(req, res);
+        var cl = await Handlers.getClassById({ body: { classId: req.params.classId } }, res);
+
+        var resp = await Posts.find({ 'class': new ObjectId(cl._id) });
+        Rest.ok(res, resp);
+
+    } catch (err) {
+        Rest.somethingWentWrong(res, err);
+    }
+}
+
 module.exports = {
     getClasses: getClasses,
     addClass: addClass,
     deleteClass: deleteClass,
     updateClass: updateClass,
-    removeStudentFromClass: removeStudentFromClass
+    removeStudentFromClass: removeStudentFromClass,
+    getPosts: getPosts
 };

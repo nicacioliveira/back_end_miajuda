@@ -5,6 +5,7 @@ var classController = require('./classes.ctrl');
 
 classRouter.get('/', classController.getClasses);
 classRouter.post('/', classController.addClass);
+classRouter.get("/posts/:classId", classController.getPosts);
 classRouter.delete('/:id', classController.deleteClass);
 classRouter.put('/', classController.updateClass);
 classRouter.delete('/student/:classId', classController.removeStudentFromClass);

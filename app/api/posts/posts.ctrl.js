@@ -9,10 +9,12 @@ async function addPost(req, res) {
     try {
 
         var user = await Handler.getUserOfHeaderAuthJWT(req, res);
-
+        var cl = await Handler.getClassById(req, res);
+        
         var newPost = {
             title: req.body.title || '',
             author: user,
+            class: cl,
             text_body: req.body.text_body || '',
         }
 
@@ -22,6 +24,7 @@ async function addPost(req, res) {
                 title: resp.title,
                 text_body: resp.text_body,
                 author: { name: resp.author.name, email: resp.author.email, role: resp.author.role },
+                class: {name: resp.class.name, number: resp.class.number, _id: resp.class._id},
                 createdAt: resp.createdAt
             }
             Rest.ok(res, postResp);
