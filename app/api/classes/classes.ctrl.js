@@ -55,7 +55,7 @@ async function addClass(req, res, next) {
             }
 
             await Classes.create(newClass).then((classresp) => {
-                Rest.json(res, 200, { class: newClass });
+                Rest.json(res, 200, { class: classresp });
             }).catch((err) => {
                 if (err.code === 11000) {
                     Rest.classAlreadyExists(res);
