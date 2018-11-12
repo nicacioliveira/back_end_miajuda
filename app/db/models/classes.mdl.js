@@ -35,7 +35,9 @@ const classSchema = Schema({
         unique: true
     },
     students : [{type: Schema.Types.ObjectId, ref:'Users'}],
-    monitors : [{type: Schema.Types.ObjectId, ref:'Users'}],
+    monitors : [{type: String}],
+    //monitors : [{type: Schema.Types.ObjectId, ref:'Users'}],
+
 
 
 }, {collection : 'classes'});
