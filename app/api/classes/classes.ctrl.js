@@ -146,7 +146,13 @@ async function getPosts(req, res) {
         await Handlers.getUserOfHeaderAuthJWT(req, res);
         var cl = await Handlers.getClassById({ body: { classId: req.params.classId } }, res);
 
-        var resp = await Posts.find({ 'class': new ObjectId(cl._id) });
+        var resp = await Posts.find({ 'class': new ObjectId(cl._id) }).populate({
+            path: 'author',
+            select: 'name'
+        }).populate({
+            path: 'class',
+            select: 'name'
+        }).sort({createdAt: -1});
         Rest.ok(res, resp);
 
     } catch (err) {

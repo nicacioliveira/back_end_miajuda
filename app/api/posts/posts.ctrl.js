@@ -16,7 +16,7 @@ async function addPost(req, res) {
             author: user,
             class: cl,
             text_body: req.body.text_body || '',
-        }
+        };
 
         await Posts.create(newPost).then(resp => {
             var postResp = {
@@ -26,7 +26,7 @@ async function addPost(req, res) {
                 author: { name: resp.author.name, email: resp.author.email, role: resp.author.role },
                 class: {name: resp.class.name, number: resp.class.number, _id: resp.class._id},
                 createdAt: resp.createdAt
-            }
+            };
             Rest.ok(res, postResp);
         }).catch(err => {
             Rest.somethingWentWrong(res, err);
