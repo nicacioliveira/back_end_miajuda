@@ -160,11 +160,35 @@ async function getPosts(req, res) {
     }
 }
 
+async function getMonitors(req, res) {
+    //body classId
+    try {
+        await Handlers.getUserOfHeaderAuthJWT(req, res);
+        var cl = await Handlers.getClassById({ body: { classId: req.params.classId } }, res);
+
+        var monitorsEmails = cl.monitors;
+        var monitors = [];
+        await Users.find({}).then(res => {
+            var users = res;
+            users.map((u) => {
+                if (monitorsEmails.indexOf(u.email) > -1) {
+                    monitors.push(u);
+                }
+            });
+
+        });
+        Rest.ok(res, monitors);
+    } catch (err) {
+        Rest.somethingWentWrong(res, err);
+    }
+}
+
 module.exports = {
     getClasses: getClasses,
     addClass: addClass,
     deleteClass: deleteClass,
     updateClass: updateClass,
     removeStudentFromClass: removeStudentFromClass,
-    getPosts: getPosts
+    getPosts: getPosts,
+    getMonitors: getMonitors
 };
