@@ -6,12 +6,39 @@ const classSchema = Schema({
         required : true,
         type: String
     },
+    optional_email: {
+        type: String
+    },
+    schedule: {
+        type: String
+    },
+    number: {
+        type: String
+    },
+    semester: {
+        type: String
+    },
+    office_hours: {
+        type: String
+    },
+    info: {
+        type: String
+    },
     teacherId: {
+        required: true,
         type: Schema.Types.ObjectId,
         ref: "Users"
     },
-    students : [String],
-    monitors : [String]
+    code: {
+        required: true,
+        type: String,
+        unique: true
+    },
+    students : [{type: Schema.Types.ObjectId, ref:'Users'}],
+    monitors : [{type: String}],
+    //monitors : [{type: Schema.Types.ObjectId, ref:'Users'}],
+
+
 
 }, {collection : 'classes'});
 

@@ -16,13 +16,26 @@
     "jest": "^22.0.4",
     "jest-cli": "^22.4.2",
     "jsonwebtoken": "^8.3.0",
+    "jwt-decode": "^2.2.0",
     "mongoose": "^5.2.17",
     "require.js": "^1.0.0",
-    "supertest": "3.0.0"
+    "supertest": "3.0.0",
+    "swagger-jsdoc": "1.9.7",
+    "swagger-ui-express": "3.0.10"
   },
   "jest": {
     "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/vendor/**"
+    ],
+    "collectCoverage": true,
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "coverageReporters": [
+      "json",
+      "text"
+    ],
     "moduleFileExtensions": [
       "js"
     ]
