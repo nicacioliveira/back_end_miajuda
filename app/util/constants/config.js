@@ -15,4 +15,5 @@ module.exports = {
     ENV: process.env.ENVIRONMENT,
     DATABASE: getDatabase(),
     PORT: process.env.PORT,
+    DBNAME: '### Mongoose BD ' + DB_PROPS.dbName + " ###"
 };
