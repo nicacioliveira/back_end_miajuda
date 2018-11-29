@@ -12,7 +12,7 @@ module.exports = () => {
             version: '0.0.1',
             description: '',
         },
-        host: 'meajudaes.herokuapp.com:8080',
+        host: 'meajudaes.herokuapp.com',
         basePath: '/api',
         securityDefinitions: {
             JWT: {
