@@ -12,7 +12,7 @@ module.exports = () => {
             version: '0.0.1',
             description: '',
         },
-        host: 'ec2-34-228-224-24.compute-1.amazonaws.com:8080',
+        host: 'meajudaes.herokuapp.com:8080',
         basePath: '/api',
         securityDefinitions: {
             JWT: {
